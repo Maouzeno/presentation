@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandCraft — Đồ án Hệ thống Tự luyện IELTS Writing Tích hợp AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       1. VIEWPORT-BASE.CSS (CHUẨN FRONTEND-SLIDES REPO)
+       ========================================================================== */
+    :root {
+      /* Theme: Cartesian Technical Light (Default) */
+      --bg-primary: #F8FAFC;
+      --bg-elevated: #FFFFFF;
+      --bg-subtle: #F1F5F9;
+      --bg-accent-soft: #EFF6FF;
+      --bg-warn-soft: #FFF7ED;
+      --bg-success-soft: #ECFDF5;
+      --bg-danger-soft: #FEF2F2;
+
+      --text-primary: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+
+      --accent-primary: #1D4ED8;
+      --accent-secondary: #EA580C;
+      --accent-emerald: #059669;
+      --accent-danger: #DC2626;
+
+      --border-color: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --grid-line: rgba(15, 23, 42, 0.045);
+
+      --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --slide-padding-x: clamp(1.75rem, 4.5vw, 4.5rem);
+      --slide-padding-y: clamp(1.25rem, 3.2vh, 2.75rem);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.07);
+    }
+
+    body[data-theme="dark"] {
+      --bg-primary: #090D16;
+      --bg-elevated: #111827;
+      --bg-subtle: #1E293B;
+      --bg-accent-soft: rgba(59, 130, 246, 0.14);
+      --bg-warn-soft: rgba(249, 115, 22, 0.14);
+      --bg-success-soft: rgba(16, 185, 129, 0.14);
+      --bg-danger-soft: rgba(239, 68, 68, 0.14);
+
+      --text-primary: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+
+      --accent-primary: #60A5FA;
+      --accent-secondary: #FB923C;
+      --accent-emerald: #34D399;
+      --accent-danger: #F87171;
+
+      --border-color: #1E293B;
+      --border-strong: #334155;
+      --grid-line: rgba(248, 250, 252, 0.04);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* Cartesian subtle background grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ==========================================================================
+       2. SLIDE STAGE & TRANSITIONS
+       ========================================================================== */
+    .deck-viewport {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      z-index: 1;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      padding: var(--slide-padding-y) var(--slide-padding-x) calc(var(--slide-padding-y) + 2.2rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(14px) scale(0.992);
+      transition:
+        opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.42s;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      z-index: 2;
+    }
+
+    /* Staggered entrance animations for elements inside active slide */
+    .slide .reveal {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .slide.active .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide.active .d-1 { transition-delay: 0.06s; }
+    .slide.active .d-2 { transition-delay: 0.12s; }
+    .slide.active .d-3 { transition-delay: 0.18s; }
+    .slide.active .d-4 { transition-delay: 0.24s; }
+    .slide.active .d-5 { transition-delay: 0.30s; }
+
+    /* ==========================================================================
+       3. TYPOGRAPHY & HEADER SYSTEM (CLAMP SCALING)
+       ========================================================================== */
+    .slide-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: clamp(0.5rem, 1.2vh, 0.9rem);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.68rem, 0.85vw, 0.8rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-primary);
+      background: var(--bg-accent-soft);
+      padding: 0.28rem 0.65rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(29, 78, 216, 0.2);
+    }
+
+    .slide-meta {
+      font-family: var(--font-mono);
+      font-size: clamp(0.68rem, 0.8vw, 0.78rem);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slide-header {
+      margin-top: clamp(0.6rem, 1.4vh, 1.1rem);
+      margin-bottom: clamp(0.6rem, 1.5vh, 1.2rem);
+      flex-shrink: 0;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.45rem, 2.55vw, 2.35rem);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+    }
+
+    .slide-subtitle {
+      margin-top: clamp(0.25rem, 0.6vh, 0.45rem);
+      font-size: clamp(0.84rem, 1.1vw, 1.02rem);
+      color: var(--text-secondary);
+      line-height: 1.45;
+      max-width: 88ch;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: clamp(0.65rem, 1.5vh, 1.15rem);
+      min-height: 0;
+    }
+
+    /* ==========================================================================
+       4. REUSABLE LAYOUT COMPONENTS (GRIDS, CARDS, TABLES, BADGES)
+       ========================================================================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.75rem, 1.6vw, 1.35rem);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(0.75rem, 1.4vw, 1.2rem);
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(0.65rem, 1.2vw, 1rem);
+    }
+
+    .grid-asymmetric {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: clamp(0.85rem, 1.8vw, 1.5rem);
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: clamp(0.8rem, 1.6vh, 1.25rem) clamp(0.9rem, 1.5vw, 1.35rem);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.35rem, 0.8vh, 0.6rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card.accent-top {
+      border-top: 3px solid var(--accent-primary);
+    }
+
+    .card.warn-top {
+      border-top: 3px solid var(--accent-secondary);
+    }
+
+    .card.emerald-top {
+      border-top: 3px solid var(--accent-emerald);
+    }
+
+    .card.highlight-box {
+      background: var(--bg-accent-soft);
+      border-color: rgba(29, 78, 216, 0.3);
+    }
+
+    .card.warn-box {
+      background: var(--bg-warn-soft);
+      border-color: rgba(234, 88, 12, 0.35);
+    }
+
+    .card-kicker {
+      font-family: var(--font-mono);
+      font-size: clamp(0.65rem, 0.78vw, 0.75rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-primary);
+    }
+
+    .card-title {
+      font-size: clamp(0.92rem, 1.18vw, 1.12rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .card-text {
+      font-size: clamp(0.76rem, 0.94vw, 0.9rem);
+      color: var(--text-secondary);
+      line-height: 1.48;
+    }
+
+    .stat-big {
+      font-family: var(--font-mono);
+      font-size: clamp(1.55rem, 2.6vw, 2.45rem);
+      font-weight: 800;
+      color: var(--accent-primary);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-big.warn { color: var(--accent-secondary); }
+    .stat-big.emerald { color: var(--accent-emerald); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.16rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: clamp(0.62rem, 0.75vw, 0.72rem);
+      font-weight: 600;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      width: fit-content;
+    }
+
+    .badge.primary { background: var(--bg-accent-soft); color: var(--accent-primary); }
+    .badge.warn { background: var(--bg-warn-soft); color: var(--accent-secondary); }
+    .badge.emerald { background: var(--bg-success-soft); color: var(--accent-emerald); }
+    .badge.danger { background: var(--bg-danger-soft); color: var(--accent-danger); }
+
+    /* Compact Data Tables */
+    .table-wrap {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table.slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: clamp(0.72rem, 0.88vw, 0.84rem);
+    }
+
+    table.slide-table th {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: clamp(0.65rem, 0.78vw, 0.75rem);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: clamp(0.45rem, 1vh, 0.7rem) clamp(0.65rem, 1.1vw, 0.95rem);
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    table.slide-table td {
+      padding: clamp(0.42rem, 0.92vh, 0.68rem) clamp(0.65rem, 1.1vw, 0.95rem);
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      vertical-align: top;
+    }
+
+    table.slide-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.slide-table tr.row-highlight td {
+      background: var(--bg-warn-soft);
+      color: var(--text-primary);
+    }
+
+    ul.clean-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(0.32rem, 0.7vh, 0.55rem);
+    }
+
+    ul.clean-list li {
+      position: relative;
+      padding-left: 1.1rem;
+      font-size: clamp(0.76rem, 0.92vw, 0.88rem);
+      color: var(--text-secondary);
+      line-height: 1.42;
+    }
+
+    ul.clean-list li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .callout-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: clamp(0.55rem, 1.1vh, 0.85rem) clamp(0.85rem, 1.4vw, 1.2rem);
+      background: var(--bg-subtle);
+      border-left: 4px solid var(--accent-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: clamp(0.75rem, 0.92vw, 0.88rem);
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       5. SPECIALIZED DIAGRAMS (2X2 MATRIX, LOOP PIPELINE)
+       ========================================================================== */
+    .matrix-box {
+      position: relative;
+      width: 100%;
+      height: clamp(230px, 46vh, 360px);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 1.2rem;
+      overflow: hidden;
+    }
+
+    .matrix-axis-x {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 50%;
+      height: 1.5px;
+      background: var(--border-strong);
+    }
+
+    .matrix-axis-y {
+      position: absolute;
+      top: 8%;
+      bottom: 8%;
+      left: 50%;
+      width: 1.5px;
+      background: var(--border-strong);
+    }
+
+    .axis-label {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: clamp(0.6rem, 0.72vw, 0.7rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.1rem 0.4rem;
+    }
+
+    .plot-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: clamp(0.68rem, 0.82vw, 0.78rem);
+      font-weight: 700;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+
+    .plot-node.target {
+      background: var(--accent-primary);
+      color: #FFFFFF;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px var(--bg-accent-soft);
+    }
+
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(0.45rem, 0.9vw, 0.8rem);
+      align-items: stretch;
+    }
+
+    .pipeline-step {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: clamp(0.65rem, 1.2vh, 0.95rem);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+    }
+
+    .pipeline-step::after {
+      content: "→";
+      position: absolute;
+      right: -0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--accent-primary);
+      z-index: 3;
+      background: var(--bg-primary);
+      border-radius: 50%;
+      width: 1.1rem;
+      height: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .pipeline-step:last-child::after {
+      display: none;
+    }
+
+    /* ==========================================================================
+       6. NAVIGATION BAR & PROGRESS INDICATOR
+       ========================================================================== */
+    .deck-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2.5rem;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--slide-padding-x);
+      z-index: 50;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .progress-track {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--border-color);
+      z-index: 51;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      width: 8.33%;
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .nav-dots {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .nav-dot.active {
+      width: 20px;
+      border-radius: 4px;
+      background: var(--accent-primary);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .ctrl-btn {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--border-color);
+    }
+
+    @media (max-width: 900px) {
+      .grid-3, .grid-4, .pipeline-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-asymmetric {
+        grid-template-columns: 1fr;
+      }
+      .pipeline-step::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+  <main class="deck-viewport" id="deck">
+
+    <!-- ======================================================================
+         SLIDE 01: TITLE SLIDE
+         ====================================================================== -->
+    <section class="slide active" data-index="0">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">BÁO CÁO ĐỒ ÁN MÔN HỌC // R1 SPECIFICATION</span>
+        <div class="slide-meta">
+          <span>IELTS WRITING TASK 2 AI SYSTEM</span>
+          <span>2026</span>
+        </div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-asymmetric" style="align-items: center;">
+          <div class="reveal d-2">
+            <div class="badge primary" style="margin-bottom: 0.9rem;">BAND 6.0–6.5 → MỤC TIÊU 7.0+</div>
+            <h1 style="font-size: clamp(2.4rem, 4.6vw, 4.2rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 0.8rem;">
+              BandCraft
+            </h1>
+            <p style="font-size: clamp(1.05rem, 1.6vw, 1.4rem); font-weight: 600; color: var(--accent-primary); margin-bottom: 0.9rem;">
+              Ứng dụng tự luyện IELTS Writing tích hợp AI: Biến nhận xét thành bài luyện có mục tiêu.
+            </p>
+            <p class="card-text" style="max-width: 62ch; margin-bottom: 1.3rem;">
+              Người tự học IELTS Writing không thiếu nguồn nhận xét; họ thiếu bước chuyển từ <strong>“chấm điểm & danh sách lỗi”</strong> sang <strong>“bài luyện ngắn gắn với lỗi”</strong> và <strong>“kiểm chứng áp dụng lại”</strong> trên bài viết mới.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+              <span class="badge primary">100% Trích dẫn có thật trong bài</span>
+              <span class="badge warn">1–3 Vấn đề ưu tiên / lượt</span>
+              <span class="badge emerald">Bản đồ 18 kỹ năng con</span>
+              <span class="badge">Deterministic Code + LLM</span>
+            </div>
+          </div>
+
+          <div class="card accent-top reveal d-3" style="padding: 1.35rem; gap: 0.75rem;">
+            <div class="card-kicker">CHU TRÌNH HỌC TẬP CỐT LÕI (CLOSED-LOOP)</div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--bg-subtle); border-radius: 6px;">
+                <span class="badge primary">01</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem;">Viết bài (Task 2 — 40 phút)</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Đếm giờ, đếm từ, lưu tự động như phòng thi</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--bg-subtle); border-radius: 6px;">
+                <span class="badge primary">02</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem;">Phản hồi có dẫn chứng (4 tiêu chí)</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Code kiểm chứng câu trích dẫn tồn tại thật</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--bg-warn-soft); border: 1px solid rgba(234,88,12,0.3); border-radius: 6px;">
+                <span class="badge warn">03</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem;">Chọn 1–3 vấn đề ưu tiên nhất</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Giảm tải nhận thức, tránh sửa dàn trải</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--bg-subtle); border-radius: 6px;">
+                <span class="badge emerald">04</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem;">Bài luyện ngắn (~5 phút)</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Khớp trực tiếp với kỹ năng yếu vừa phát hiện</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0.75rem; background: var(--bg-success-soft); border-radius: 6px;">
+                <span class="badge emerald">05</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.85rem;">Áp dụng lại & Theo dõi qua nhiều bài</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Kiểm tra lỗi cũ còn tái diễn ở đoạn/bài mới không</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 02: PHẦN 1 - VÌ SAO VẤN ĐỀ ĐÁNG QUAN TÂM?
+         ====================================================================== -->
+    <section class="slide" data-index="1">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 1 // KHÁCH HÀNG & PAIN POINT</span>
+        <div class="slide-meta">1.1 VÌ SAO VẤN ĐỀ ĐÁNG QUAN TÂM?</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Giá trị thực tế của IELTS đối với sinh viên Việt Nam</h2>
+        <p class="slide-subtitle">Chứng chỉ tiếng Anh chuẩn hóa phục vụ trực tiếp 3 cột mốc học thuật và chuyển tiếp nghề nghiệp.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3 reveal d-3">
+          <div class="card accent-top">
+            <span class="card-kicker">GIÁ TRỊ 01 // HỌC THUẬT NỘI ĐỊA</span>
+            <div class="stat-big">Chuẩn đầu ra</div>
+            <div class="card-title">Đáp ứng điều kiện học tập & xét tốt nghiệp</div>
+            <p class="card-text">
+              Các trường đại học quy định mốc chuẩn ngoại ngữ bắt buộc trước khi xét tốt nghiệp (ví dụ: IELTS 5.0 với chương trình CNTT tăng cường tiếng Anh tại ĐH KHTN).
+            </p>
+          </div>
+
+          <div class="card accent-top">
+            <span class="card-kicker">GIÁ TRỊ 02 // HỌC TẬP QUỐC TẾ</span>
+            <div class="stat-big">&gt;13.500</div>
+            <div class="card-title">Tổ chức & Đại học toàn cầu công nhận</div>
+            <p class="card-text">
+              Theo <strong>IELTS Partners</strong>, hơn 13.500 tổ chức quốc tế chấp nhận IELTS. Giúp ứng viên cung cấp bằng chứng năng lực ngoại ngữ khi nộp hồ sơ học bổng/du học.
+            </p>
+            <span class="badge" style="margin-top: auto;">Nguồn: ielts.org</span>
+          </div>
+
+          <div class="card warn-top">
+            <span class="card-kicker">GIÁ TRỊ 03 // CHUYỂN TIẾP NGHỀ NGHIỆP</span>
+            <div class="stat-big warn">59,5%</div>
+            <div class="card-title">Chọn cơ hội việc làm là động cơ học</div>
+            <p class="card-text">
+              Nghiên cứu của <strong>Nguyen và cộng sự (2022)</strong> trên 200 người học IELTS tại miền Trung ghi nhận 59,5% hướng tới mục tiêu việc làm mong muốn.
+            </p>
+            <span class="badge warn" style="margin-top: auto;">IELTS Research Reports 4.1.1</span>
+          </div>
+        </div>
+
+        <div class="callout-strip reveal d-4">
+          <div>
+            <strong>Góc nhìn phản biện dữ liệu:</strong> Số liệu 59,5% chứng minh động lực nghề nghiệp là có thật trong mẫu khảo sát, nhưng <em>không mặc định mọi công việc đều yêu cầu IELTS</em>. Mức điểm cần đạt phụ thuộc vào từng chương trình cụ thể.
+          </div>
+          <span class="badge primary">Evidence-Based Framing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 03: RÀO CẢN KHIẾN NGƯỜI HỌC BỎ CUỘC
+         ====================================================================== -->
+    <section class="slide" data-index="2">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 1 // KHÁCH HÀNG & PAIN POINT</span>
+        <div class="slide-meta">1.2 RÀO CẢN THỰC TẾ KHI TỰ HỌC</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Rào cản kép: Chi phí đắt đỏ, lịch phân mảnh & thiếu người chữa bài</h2>
+        <p class="slide-subtitle">So sánh tương quan chi phí khóa học/lệ phí thi với thu nhập làm thêm và bài toán tự học không có phản hồi.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-asymmetric reveal d-3">
+          <div class="card">
+            <div class="card-kicker">RÀO CẢN 1 // TÀI CHÍNH & QUỸ THỜI GIAN HẠN HẸP</div>
+            <div class="grid-2" style="margin-top: 0.25rem;">
+              <div style="background: var(--bg-subtle); padding: 0.7rem; border-radius: 8px;">
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">HỌC PHÍ TRUNG TÂM [S01]</div>
+                <div class="stat-big" style="font-size: 1.45rem;">10,5 – 24,9 tr</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  The IELTS Workshop (15/01/2026): Senior (5.5→6.5) 10,5tr online / 14tr offline; Master 24,9tr.
+                </div>
+              </div>
+              <div style="background: var(--bg-subtle); padding: 0.7rem; border-radius: 8px;">
+                <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">KHẢO SÁT ĐH THỦ DẦU MỘT [S02]</div>
+                <div class="stat-big warn" style="font-size: 1.45rem;">2,965 tr/tháng</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  132 phản hồi (02–04/2025): 77 SV làm thêm TB <strong>16,188 giờ/tuần</strong>; thu nhập TB 2,965 triệu.
+                </div>
+              </div>
+            </div>
+
+            <div style="background: var(--bg-warn-soft); border: 1px solid rgba(234,88,12,0.3); padding: 0.65rem 0.85rem; border-radius: 8px; margin-top: 0.3rem;">
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--accent-secondary);">Phép đối chiếu độ lớn khoản chi (Minh họa):</div>
+              <ul class="clean-list" style="margin-top: 0.25rem;">
+                <li>Khóa học 10,5 triệu VNĐ ≈ <strong>3,54 tháng</strong> tổng thu nhập làm thêm trung bình.</li>
+                <li>Lệ phí thi British Council (<strong>4.664.000đ</strong>; One Skill Retake <strong>2.940.000đ</strong> [S03]) ≈ <strong>1,57 tháng</strong> thu nhập.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card emerald-top">
+            <div class="card-kicker">RÀO CẢN 2 // THIẾU NGƯỜI CHỮA BÀI KHI TỰ HỌC</div>
+            <div class="card-title">“Không có người chữa bài nên không biết sai ở đâu”</div>
+            <p class="card-text">
+              <strong>Case study thực tế (VnExpress, 31/07/2024):</strong> Hoàng Văn Thái (SV ĐH Kinh tế TP.HCM, tự học đạt 8.5 IELTS) chia sẻ thời gian đầu kỹ năng Nói & Viết chững lại vì không có người chỉ lỗi.
+            </p>
+            <p class="card-text">
+              Bước ngoặt chỉ đến khi Thái chủ động nhờ được một người bạn hỗ trợ luyện và <strong>góp ý chi tiết từng bài</strong>.
+            </p>
+            <div style="margin-top: auto; padding-top: 0.6rem; border-top: 1px dashed var(--border-strong);">
+              <div style="font-weight: 700; font-size: 0.8rem; color: var(--accent-primary);">Hệ quả thiết kế sản phẩm:</div>
+              <p style="font-size: 0.76rem; color: var(--text-secondary); line-height: 1.4;">
+                Bài luyện ngắn (~5 phút) phù hợp lịch phân mảnh, nhưng bài thi đầy đủ vẫn cần phiên 40–60 phút. Không hứa hẹn ảo rằng mọi buổi học đều xong trong vài phút.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 04: XÁC ĐỊNH 3 PAIN POINTS CỐT LÕI (P1, P2, P3)
+         ====================================================================== -->
+    <section class="slide" data-index="3">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 1 // KHÁCH HÀNG & PAIN POINT</span>
+        <div class="slide-meta">1.3 MA TRẬN NỖI ĐAU & TÍN HIỆU KIỂM CHỨNG</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Ba nỗi đau cốt lõi của người tự học IELTS Writing</h2>
+        <p class="slide-subtitle">Từ việc quá tải nhận xét (P1) đến nút thắt trung tâm: hiểu nhận xét nhưng không biết luyện gì tiếp theo (P2).</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="table-wrap reveal d-3">
+          <table class="slide-table">
+            <thead>
+              <tr>
+                <th style="width: 28%;">Pain Point (Nỗi đau)</th>
+                <th style="width: 36%;">Hậu quả thực tế xảy ra</th>
+                <th style="width: 36%;">Tín hiệu kiểm chứng (Validation Signal)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="badge primary" style="margin-bottom: 0.25rem;">P1 // QUÁ TẢI PHẢN HỒI</span>
+                  <div style="font-weight: 700; color: var(--text-primary);">Không biết sửa lỗi nào trước</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">Nhận điểm số hoặc quá nhiều nhận xét dàn trải cùng lúc.</div>
+                </td>
+                <td>
+                  Chỉ sửa lặt vặt từng từ theo gợi ý trong khi <strong>luận điểm cốt lõi vẫn yếu</strong>, hoặc bỏ qua luôn bản chữa vì quá tải nhận thức.
+                </td>
+                <td>
+                  Người học <strong>tự giải thích đúng vấn đề</strong> và tự sửa được đoạn văn liên quan, thay vì sao chép nguyên bản AI viết lại.
+                </td>
+              </tr>
+
+              <tr class="row-highlight">
+                <td>
+                  <span class="badge warn" style="margin-bottom: 0.25rem;">P2 // PAIN POINT TRUNG TÂM ★</span>
+                  <div style="font-weight: 700; color: var(--text-primary);">Hiểu nhận xét nhưng không biết luyện tiếp</div>
+                  <div style="font-size: 0.74rem;">Biết mình cần “phát triển ý” nhưng không biết hoạt động cụ thể nào giúp làm được.</div>
+                </td>
+                <td>
+                  Tiếp tục viết tràn lan cả bài mới hoặc chỉ đọc bài mẫu (sample essays), dẫn đến <strong>lặp lại đúng lỗi cũ ở đề tiếp theo</strong>.
+                </td>
+                <td>
+                  Sau 1 bài luyện nhỏ gắn với lỗi, người học <strong>viết được đoạn mới không kèm đáp án</strong> mà không lặp lại lỗi đó.
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <span class="badge emerald" style="margin-bottom: 0.25rem;">P3 // ĐỨT GÃY LỘ TRÌNH</span>
+                  <div style="font-weight: 700; color: var(--text-primary);">Khó duy trì lộ trình phù hợp</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">Chọn tài liệu góp nhặt từ nhiều nguồn, không biết khi nào nên đổi trọng tâm.</div>
+                </td>
+                <td>
+                  Mất động lực duy trì việc luyện viết hàng tuần, <strong>không nhìn thấy sự tiến bộ</strong> cụ thể nằm ở kỹ năng nào.
+                </td>
+                <td>
+                  <strong>Số hoạt động thực sự hoàn thành</strong> trong một kế hoạch ngắn hạn dựa trên các lỗi hệ thống đã quan sát.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout-strip reveal d-4">
+          <div>
+            <strong>Tại sao chọn Sinh viên làm nhóm mục tiêu ban đầu?</strong> (1) Giao thoa mục tiêu học tập & nghề nghiệp; (2) Dễ tiếp cận qua CLB/lớp học để quan sát chu kỳ nhiều tuần; (3) Đã có nền tảng để tự sửa đoạn và chuyển giao kỹ năng.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 05: CHÂN DUNG KHÁCH HÀNG MỤC TIÊU (ICPs)
+         ====================================================================== -->
+    <section class="slide" data-index="4">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 1 // KHÁCH HÀNG & PAIN POINT</span>
+        <div class="slide-meta">1.4 CHÂN DUNG KHÁCH HÀNG MỤC TIÊU (ICP)</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Chân dung khách hàng mục tiêu & Persona mở rộng</h2>
+        <p class="slide-subtitle">Tập trung vào sinh viên sẵn sàng tự viết lại bài thay vì chỉ xem điểm hoặc chép văn mẫu.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3 reveal d-3">
+          <!-- ICP 1 -->
+          <div class="card accent-top">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-kicker">CHÂN DUNG 1 (CORE ICP)</span>
+              <span class="badge primary">6.0–6.5 → 7.0+</span>
+            </div>
+            <div class="card-title">Người sắp đi làm / Mới tốt nghiệp</div>
+            <ul class="clean-list">
+              <li><strong>Đối tượng:</strong> Sinh viên năm cuối hoặc cử nhân mới ra trường.</li>
+              <li><strong>Mục tiêu:</strong> Đạt 7.0+ để làm đẹp CV, ứng tuyển việc làm hoặc săn học bổng.</li>
+              <li><strong>Tình huống:</strong> Đã có bài viết gần đây, từng nhận feedback (AI, bạn bè, bài mẫu) nhưng <em>không biết luyện gì tiếp</em>.</li>
+              <li><strong>Rào cản chính:</strong> <strong>P1, P2</strong>.</li>
+              <li><strong>Động lực:</strong> Mùa tuyển dụng, hạn nộp hồ sơ.</li>
+            </ul>
+          </div>
+
+          <!-- ICP 2 -->
+          <div class="card warn-top">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-kicker" style="color: var(--accent-secondary);">CHÂN DUNG 2 (SECONDARY)</span>
+              <span class="badge warn">5.0–5.5 → Chuẩn đầu ra</span>
+            </div>
+            <div class="card-title">Người cần chuẩn đầu ra đại học</div>
+            <ul class="clean-list">
+              <li><strong>Đối tượng:</strong> Sinh viên năm 2 – năm 3.</li>
+              <li><strong>Mục tiêu:</strong> Đạt chuẩn ngoại ngữ trước xét tốt nghiệp (VD: IELTS 5.0 CNTT tăng cường tiếng Anh, ĐH KHTN).</li>
+              <li><strong>Tình huống:</strong> Lịch học và làm thêm dày đặc, ngân sách thấp, cần công cụ luyện linh hoạt.</li>
+              <li><strong>Rào cản chính:</strong> <strong>Chi phí, Thời gian, P2</strong>.</li>
+              <li><strong>Động lực:</strong> Hạn nộp chứng chỉ xét tốt nghiệp.</li>
+            </ul>
+          </div>
+
+          <!-- Teacher Persona -->
+          <div class="card emerald-top" style="background: var(--bg-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-kicker" style="color: var(--accent-emerald);">PERSONA MỞ RỘNG</span>
+              <span class="badge emerald">Expert-in-the-loop</span>
+            </div>
+            <div class="card-title">Giáo viên hỗ trợ chất lượng</div>
+            <ul class="clean-list">
+              <li><strong>Hồ sơ:</strong> Giáo viên IELTS độc lập hoặc dạy lớp nhỏ, học viên quanh band 6.</li>
+              <li><strong>Thực tế nghiên cứu [S08]:</strong> Khảo sát 30 GV, phỏng vấn 10 người, phân tích 100 bài luận tại 5 trung tâm ở Buôn Ma Thuột cho thấy GV hay chữa toàn diện dù biết phản hồi có trọng tâm tốt hơn.</li>
+              <li><strong>Vai trò giai đoạn PoC:</strong> Xây & rà tiêu chí, kiểm tra mẫu feedback, chấm bài ẩn danh để kiểm định hệ thống (chưa mở bán B2B).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 06: PHẦN 2 - ĐÁNH GIÁ CÁC CÔNG CỤ HIỆN TẠI
+         ====================================================================== -->
+    <section class="slide" data-index="5">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 2 // CÁC CÔNG CỤ HIỆN TẠI</span>
+        <div class="slide-meta">2.1 & 2.2 KHẢO SÁT 5 NHÓM CÔNG CỤ</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Đánh giá 5 nhóm công cụ hiện có theo 5 tiêu chí cốt lõi</h2>
+        <p class="slide-subtitle">Tiêu chí: (1) Bám chuẩn IELTS; (2) Có dẫn chứng trong bài; (3) Chỉ ra lỗi ưu tiên; (4) Có bài luyện nối tiếp; (5) Chi phí & tốc độ.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="table-wrap reveal d-3">
+          <table class="slide-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">Nhóm công cụ</th>
+                <th style="width: 20%;">Mục đích sử dụng</th>
+                <th style="width: 26%;">Ưu điểm chính</th>
+                <th style="width: 34%;">Hạn chế so với nhu cầu tự học</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Grammarly / QuillBot</strong></td>
+                <td>Bắt lỗi ngữ pháp, paraphrase câu</td>
+                <td>Nhanh, sửa lỗi cấp từ/câu chính xác</td>
+                <td>Không chấm Task Response & Coherence/Cohesion; tạo sự phụ thuộc gợi ý tự động (phòng thi thật không có).</td>
+              </tr>
+              <tr>
+                <td><strong>ChatGPT / Gemini</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">(Chat thông thường)</span></td>
+                <td>Dán đề & bài viết, yêu cầu chấm IELTS</td>
+                <td>Miễn phí/rẻ, phản hồi tức thì, giải thích linh hoạt</td>
+                <td>Điểm dao động giữa các lần hỏi; <strong>bịa trích dẫn không có trong bài</strong>; hay viết lại cả bài mẫu; không theo dõi lịch sử lỗi.</td>
+              </tr>
+              <tr class="row-highlight">
+                <td><strong>Prep AI</strong><br><span style="font-size:0.7rem;">(Đối thủ gần nhất [5])</span></td>
+                <td>Phòng luyện ảo Writing, lấy điểm & nhận xét</td>
+                <td>Chấm 4 tiêu chí; nhận xét chi tiết từ vựng/cấu trúc; có bản nâng cấp & lưu lịch sử</td>
+                <td>Trọng tâm dừng ở chấm điểm & bản nâng cấp; <strong>không mô tả bài luyện riêng gắn với từng lỗi</strong>; gói Pro giới hạn 10 lượt/ngày.</td>
+              </tr>
+              <tr>
+                <td><strong>Write & Improve</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">(Cambridge [6])</span></td>
+                <td>Luyện viết, xem gợi ý sửa câu</td>
+                <td>Hàng trăm đề miễn phí, phản hồi cấp từ/câu, biểu đồ CEFR</td>
+                <td>Phần IELTS khóa ở gói trả phí <em>+Test Zone</em>; không có bài luyện kỹ năng nối tiếp sau phản hồi.</td>
+              </tr>
+              <tr>
+                <td><strong>Giáo viên / Trung tâm</strong></td>
+                <td>Chữa bài chuyên sâu trực tiếp</td>
+                <td>Đúng chuyên môn, hiểu rõ ngữ cảnh người học</td>
+                <td>Chi phí rất cao (<strong>10,5–24,9 triệu/khóa</strong>); phụ thuộc lịch lớp cố định; khó duy trì tần suất luyện dày.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 07: KHOẢNG TRỐNG CỐT LÕI (MARKET GAP)
+         ====================================================================== -->
+    <section class="slide" data-index="6">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 2 // CÁC CÔNG CỤ HIỆN TẠI</span>
+        <div class="slide-meta">2.3 KHOẢNG TRỐNG CỐT LÕI (CORE GAP)</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Khoảng trống cốt lõi: Đứt gãy giữa “Chấm điểm” và “Luyện tập”</h2>
+        <p class="slide-subtitle">Định vị các công cụ trên 2 trục và mắt xích hành động bị bỏ trống ở tất cả các giải pháp hiện hành.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-asymmetric reveal d-3" style="align-items: stretch;">
+          <!-- 2x2 Visual Plot -->
+          <div class="matrix-box">
+            <div class="matrix-axis-x"></div>
+            <div class="matrix-axis-y"></div>
+            <span class="axis-label" style="top: 0.5rem; left: 50%; transform: translateX(-50%);">▲ ĐỘ SÂU & CĂN CỨ PHẢN HỒI CAO</span>
+            <span class="axis-label" style="bottom: 0.5rem; left: 50%; transform: translateX(-50%);">▼ PHẢN HỒI HỜI HỢT / THIẾU CĂN CỨ</span>
+            <span class="axis-label" style="left: 0.6rem; top: 50%; transform: translateY(-130%);">◄ CHẬM & ĐẮT ĐỎ</span>
+            <span class="axis-label" style="right: 0.6rem; top: 50%; transform: translateY(-130%);">NHANH & CHI PHÍ THẤP ►</span>
+
+            <!-- Nodes -->
+            <div class="plot-node" style="left: 23%; top: 24%;">Giáo viên / Trung tâm (10.5–24.9tr)</div>
+            <div class="plot-node" style="left: 74%; top: 76%;">Grammarly / QuillBot (Cấp câu)</div>
+            <div class="plot-node" style="left: 78%; top: 60%;">ChatGPT / Gemini (Hay bịa trích dẫn)</div>
+            <div class="plot-node" style="left: 65%; top: 44%;">Write & Improve (+Test Zone)</div>
+            <div class="plot-node" style="left: 62%; top: 30%; border-color: var(--accent-secondary);">Prep AI (Dừng ở chấm & nâng cấp)</div>
+            <div class="plot-node target" style="left: 80%; top: 20%;">★ BandCraft (Có dẫn chứng + Bài luyện)</div>
+          </div>
+
+          <!-- Right explanation -->
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; justify-content: center;">
+            <div class="card warn-box">
+              <span class="card-kicker" style="color: var(--accent-secondary);">MẮT XÍCH BỊ BỎ TRỐNG</span>
+              <div class="card-title">Chấm điểm → Bài luyện có mục tiêu → Áp dụng lại</div>
+              <p class="card-text">
+                Cả 5 nhóm công cụ đều kết thúc sau khi trả điểm số, danh sách lỗi hoặc một bản văn mẫu viết lại. Người học vẫn rơi vào <strong>Pain Point P2</strong>: đọc xong không biết làm gì tiếp theo để hết lỗi.
+              </p>
+            </div>
+
+            <div class="card accent-top">
+              <span class="card-kicker">KHÁC BIỆT CỦA BANDCRAFT SO VỚI PREP AI</span>
+              <ul class="clean-list">
+                <li><strong>Sau bước chấm điểm:</strong> Tự động nối mỗi lỗi ưu tiên với 1 bài luyện 5 phút từ bản đồ 18 kỹ năng con.</li>
+                <li><strong>Cơ chế kiểm chứng bằng Code:</strong> Mọi câu AI trích dẫn đều được thuật toán đối chiếu nguyên văn trong bài viết trước khi hiển thị (chống Hallucination 100%).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 08: PHẦN 3 - GIẢI PHÁP BANDCRAFT & KIẾN TRÚC PHÂN RÃ
+         ====================================================================== -->
+    <section class="slide" data-index="7">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 3 // GIẢI PHÁP ĐỀ XUẤT</span>
+        <div class="slide-meta">3.1 & 3.2 PHÁT BIỂU BÀI TOÁN & KIẾN TRÚC BANDCRAFT</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">BandCraft: Chu trình 5 bước & Phân rã Thuật toán Xác định + LLM</h2>
+        <p class="slide-subtitle">Kết hợp sự chính xác tuyệt đối của Deterministic Code với khả năng phân tích ngôn ngữ của LLM.</p>
+      </div>
+
+      <div class="slide-body">
+        <!-- 5-Step Pipeline -->
+        <div class="pipeline-flow reveal d-3">
+          <div class="pipeline-step">
+            <span class="badge">BƯỚC 1 // CODE</span>
+            <div class="card-title" style="font-size: 0.88rem;">Kiểm tra đầu vào</div>
+            <p class="card-text" style="font-size: 0.74rem;">Đếm từ, kiểm tra ngôn ngữ, chặn prompt injection & yêu cầu viết hộ.</p>
+          </div>
+          <div class="pipeline-step" style="border-top: 3px solid var(--accent-secondary);">
+            <span class="badge warn">BƯỚC 2 // LLM</span>
+            <div class="card-title" style="font-size: 0.88rem;">Chấm 4 tiêu chí</div>
+            <p class="card-text" style="font-size: 0.74rem;">Phân tích TR, CC, LR, GRA kèm trích dẫn câu gốc và giải thích nguyên nhân.</p>
+          </div>
+          <div class="pipeline-step" style="border-top: 3px solid var(--accent-primary);">
+            <span class="badge primary">BƯỚC 3 // CODE</span>
+            <div class="card-title" style="font-size: 0.88rem;">Kiểm chứng & Ưu tiên</div>
+            <p class="card-text" style="font-size: 0.74rem;">Xác thực 100% trích dẫn có thật; lọc chọn đúng 1–3 lỗi ưu tiên cao nhất.</p>
+          </div>
+          <div class="pipeline-step" style="border-top: 3px solid var(--accent-emerald);">
+            <span class="badge emerald">BƯỚC 4 // CODE</span>
+            <div class="card-title" style="font-size: 0.88rem;">Giao bài luyện ngắn</div>
+            <p class="card-text" style="font-size: 0.74rem;">Ánh xạ lỗi vào <strong>Bản đồ 18 kỹ năng con</strong> để lấy bài tập ~5 phút tương ứng.</p>
+          </div>
+          <div class="pipeline-step">
+            <span class="badge primary">BƯỚC 5 // CODE + LLM</span>
+            <div class="card-title" style="font-size: 0.88rem;">Áp dụng & Theo dõi</div>
+            <p class="card-text" style="font-size: 0.74rem;">Người học tự viết lại đoạn/bài mới; hệ thống kiểm tra lỗi cũ còn lặp lại không.</p>
+          </div>
+        </div>
+
+        <!-- 4 Core Functional Pillars -->
+        <div class="grid-4 reveal d-4">
+          <div class="card">
+            <span class="card-kicker">CHỨC NĂNG 01</span>
+            <div class="card-title" style="font-size: 0.88rem;">Phản hồi gắn với bài viết</div>
+            <p class="card-text" style="font-size: 0.74rem;">Bấm vào nhận xét là tô sáng câu tương ứng trong bài, giải thích rõ nguyên nhân & hướng sửa.</p>
+          </div>
+          <div class="card">
+            <span class="card-kicker">CHỨC NĂNG 02</span>
+            <div class="card-title" style="font-size: 0.88rem;">Ưu tiên 1–3 vấn đề</div>
+            <p class="card-text" style="font-size: 0.74rem;">Tránh ngợp thông tin; giúp người học có ngay bước tiếp theo rõ ràng sau khi đọc báo cáo.</p>
+          </div>
+          <div class="card">
+            <span class="card-kicker">CHỨC NĂNG 03</span>
+            <div class="card-title" style="font-size: 0.88rem;">Bài luyện cá nhân hóa</div>
+            <p class="card-text" style="font-size: 0.74rem;">Bài tập ngắn (phát triển luận điểm, sửa câu...) để người học thực hành ngay lập tức.</p>
+          </div>
+          <div class="card">
+            <span class="card-kicker">CHỨC NĂNG 04</span>
+            <div class="card-title" style="font-size: 0.88rem;">Theo dõi lỗi xuyên suốt</div>
+            <p class="card-text" style="font-size: 0.74rem;">Thống kê kỹ năng hay tái phạm qua nhiều bài để biết đã khắc phục được gì.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 09: RÀNG BUỘC BÀI TOÁN & NGOÀI PHẠM VI (NON-GOALS)
+         ====================================================================== -->
+    <section class="slide" data-index="8">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 3 // GIẢI PHÁP ĐỀ XUẤT</span>
+        <div class="slide-meta">3.3 RÀNG BUỘC & 3.5 NGOÀI PHẠM VI (NON-GOALS)</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Ranh giới bài toán: 7 Ràng buộc thiết kế & 5 Non-goals</h2>
+        <p class="slide-subtitle">Đảm bảo tính khả thi của PoC, tính trung thực học thuật và sự tin cậy của hệ thống.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-asymmetric reveal d-3">
+          <!-- 7 Constraints -->
+          <div class="table-wrap">
+            <table class="slide-table">
+              <thead>
+                <tr>
+                  <th style="width: 30%;">Loại ràng buộc</th>
+                  <th>Mô tả yêu cầu thiết kế (Bảng 3.1)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Độ tin cậy</strong></td>
+                  <td>Mọi trích dẫn phải <strong>có thật 100% trong bài</strong>; nhận xét bịa đặt sẽ phá hủy niềm tin.</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Tải nhận thức</strong></td>
+                  <td>Chỉ hiển thị <strong>1–3 vấn đề ưu tiên</strong> mỗi lượt để người học không bỏ qua bản chữa.</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Tính học thuật</strong></td>
+                  <td>Hệ thống <strong>tuyệt đối không viết hộ bài</strong>; người học phải là chủ thể viết.</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Thời gian</strong></td>
+                  <td>Bài luyện kỹ năng ngắn (~5 phút), nhưng bài thi Task 2 đầy đủ vẫn giữ chuẩn 40 phút.</td>
+                </tr>
+                <tr>
+                  <td><strong>5. Chi phí</strong></td>
+                  <td>Ngân sách sinh viên thấp; chi phí vận hành AI trên mỗi lượt chấm phải tối ưu.</td>
+                </tr>
+                <tr>
+                  <td><strong>6. Môi trường luyện</strong></td>
+                  <td>Tránh phụ thuộc gợi ý tự động hoặc viết quá giờ làm sai lệch điều kiện phòng thi.</td>
+                </tr>
+                <tr>
+                  <td><strong>7. Quyền riêng tư</strong></td>
+                  <td>Bài viết là dữ liệu cá nhân; chỉ người học và người được cấp quyền mới xem được.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 5 Non-Goals -->
+          <div class="card warn-top" style="justify-content: space-between;">
+            <div>
+              <span class="card-kicker" style="color: var(--accent-secondary);">3.5 NGOÀI PHẠM VI POC (NON-GOALS)</span>
+              <div class="card-title" style="margin: 0.35rem 0 0.65rem;">Những gì hệ thống chủ động KHÔNG làm trong giai đoạn PoC:</div>
+              <ul class="clean-list">
+                <li><strong>Không thay thế điểm thi chính thức</strong> của British Council / IDP (chỉ đóng vai trò <em>formative assessment</em> phục vụ luyện tập).</li>
+                <li><strong>Không viết hộ bài luận hoàn chỉnh</strong> dưới mọi hình thức.</li>
+                <li><strong>Chưa hỗ trợ Task 1, Speaking, Listening, Reading:</strong> Tập trung vào Writing Task 2 vì chiếm <strong>2/3 trọng số điểm</strong> kỹ năng Viết.</li>
+                <li><strong>Chưa triển khai phân hệ Giáo viên:</strong> Chưa làm tính năng quản lý lớp, cấu hình barem riêng hay luồng duyệt bài.</li>
+                <li><strong>Chưa nhận dạng chữ viết tay (OCR):</strong> Người học nhập văn bản trực tiếp trên giao diện web.</li>
+              </ul>
+            </div>
+            <div class="badge warn">Ranh giới rõ ràng giúp kiểm thử chính xác</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 10: DANH SÁCH 11 USE CASES CHO POC
+         ====================================================================== -->
+    <section class="slide" data-index="9">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 3 // GIẢI PHÁP ĐỀ XUẤT</span>
+        <div class="slide-meta">3.4 DANH SÁCH 11 USE CASES (BẢNG 3.2)</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Đặc tả 11 Use Cases: 8 Luồng học chính & 3 Tình huống bất thường</h2>
+        <p class="slide-subtitle">Bao phủ trọn vẹn chu trình học tập chuẩn và cơ chế phòng vệ an toàn trước các ca đầu vào xấu.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-asymmetric reveal d-3">
+          <!-- 8 Main Flow Use Cases -->
+          <div class="card accent-top">
+            <span class="card-kicker">8 USE CASES THUỘC LUỒNG HỌC CHÍNH (MAIN FLOW)</span>
+            <div class="grid-2" style="gap: 0.5rem; margin-top: 0.25rem;">
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-subtle); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge primary">UC01</span> <strong>Chọn đề Task 2</strong> theo 5 dạng (Opinion, Discussion, Problem–Solution, Adv–Disadv, Two-part).
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-subtle); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge primary">UC02</span> <strong>Viết bài 40 phút</strong> có đếm giờ, đếm từ, tự động lưu; nộp sớm hoặc tự lưu khi hết giờ.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-subtle); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge primary">UC03</span> <strong>Nhận band ước lượng</strong> theo 4 tiêu chí (TR, CC, LR, GRA) kèm giải thích chi tiết.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-subtle); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge primary">UC04</span> <strong>Tương tác trích dẫn:</strong> Bấm vào nhận xét, câu tương ứng trong bài viết được tô sáng.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-warn-soft); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge warn">UC05</span> <strong>Nhận 1–3 vấn đề ưu tiên</strong> thay vì một danh sách lỗi dài gây quá tải.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-warn-soft); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge warn">UC06</span> <strong>Làm bài luyện ngắn (~5 phút)</strong> gắn trực tiếp với kỹ năng yếu vừa phát hiện.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-success-soft); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge emerald">UC07</span> <strong>Viết lại đoạn sửa / đề mới:</strong> Hệ thống kiểm tra lỗi cũ còn lặp lại hay không.
+              </div>
+              <div style="padding: 0.45rem 0.6rem; background: var(--bg-success-soft); border-radius: 6px; font-size: 0.75rem;">
+                <span class="badge emerald">UC08</span> <strong>Xem lịch sử tiến bộ</strong> và thống kê các kỹ năng lặp lỗi nhiều nhất.
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 Exception Use Cases -->
+          <div class="card warn-top">
+            <span class="card-kicker" style="color: var(--accent-danger);">3 USE CASES BẤT THƯỜNG (EDGE & SAFETY)</span>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.25rem;">
+              <div style="padding: 0.6rem; background: var(--bg-danger-soft); border-left: 3px solid var(--accent-danger); border-radius: 4px;">
+                <div style="font-weight: 700; font-size: 0.8rem;"><span class="badge danger">UC09</span> Chặn Input không hợp lệ & Prompt Injection</div>
+                <p style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Bài quá ngắn, sai ngôn ngữ hoặc chứa lệnh điều khiển AI bị từ chối ngay ở tầng Code kèm lý do rõ ràng.
+                </p>
+              </div>
+
+              <div style="padding: 0.6rem; background: var(--bg-warn-soft); border-left: 3px solid var(--accent-secondary); border-radius: 4px;">
+                <div style="font-weight: 700; font-size: 0.8rem;"><span class="badge warn">UC10</span> Từ chối yêu cầu viết hộ bài</div>
+                <p style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Khi người dùng yêu cầu viết hộ luận văn, hệ thống từ chối và chuyển sang <strong>gợi ý dàn ý (outline)</strong> để người học tự viết.
+                </p>
+              </div>
+
+              <div style="padding: 0.6rem; background: var(--bg-subtle); border-left: 3px solid var(--accent-primary); border-radius: 4px;">
+                <div style="font-weight: 700; font-size: 0.8rem;"><span class="badge primary">UC11</span> Xử lý khi dịch vụ AI quá tải / lỗi</div>
+                <p style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Trả ngay phân tích cơ bản bằng thuật toán (số từ, cấu trúc đoạn), phần chấm sâu bằng LLM được xử lý bất đồng bộ sau.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 11: PHẦN 4 - KẾ HOẠCH ĐÁNH GIÁ 2 LỚP ĐỘC LẬP
+         ====================================================================== -->
+    <section class="slide" data-index="10">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 4 // KẾ HOẠCH ĐÁNH GIÁ</span>
+        <div class="slide-meta">4.1 CHẤT LƯỢNG HỆ THỐNG & 4.3 TRẢI NGHIỆM NGƯỜI HỌC</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Kế hoạch đánh giá 2 lớp độc lập: Hệ thống & Con người</h2>
+        <p class="slide-subtitle">Phản hồi chính xác chưa chắc khiến người học luyện tập; độ hài lòng cao chưa đủ chứng minh tiến bộ thực chất.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2 reveal d-3">
+          <!-- Layer 1: System Quality -->
+          <div class="card accent-top">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-kicker">LỚP 1 // CHẤT LƯỢNG HỆ THỐNG (TECHNICAL)</span>
+              <span class="badge primary">30 bài chuẩn + Bộ ca xấu</span>
+            </div>
+            <p class="card-text" style="font-size: 0.74rem;">
+              Benchmark gồm ~30 bài Task 2 có điểm tham chiếu từ chuyên gia (band 5.0–7.5, đủ dạng đề) + bộ test prompt injection/quá ngắn.
+            </p>
+            <table class="slide-table" style="margin-top: 0.2rem;">
+              <thead>
+                <tr>
+                  <th>Chỉ số đo lường</th>
+                  <th>Cách đo</th>
+                  <th>Ngưỡng</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Độ tin cậy trích dẫn</strong><br><span style="font-size:0.68rem;">(Evidence Validity)</span></td>
+                  <td>% nhận xét có đoạn trích tồn tại thật trong bài</td>
+                  <td><span class="badge emerald">100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tính nhất quán</strong></td>
+                  <td>Chấm cùng 1 bài 5 lần, đo độ lệch max</td>
+                  <td><span class="badge primary">≤ 0.5 band</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tính hành động được</strong><br><span style="font-size:0.68rem;">(Actionability)</span></td>
+                  <td>% nhận xét dẫn tới đúng bài luyện (chuyên gia duyệt)</td>
+                  <td><span class="badge primary">≥ 80%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>An toàn (Safety)</strong></td>
+                  <td>% ca xấu bị chặn đúng kèm lý do</td>
+                  <td><span class="badge emerald">100%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Độ trễ (Latency)</strong></td>
+                  <td>Từ lúc nộp đến khi có báo cáo đầy đủ</td>
+                  <td><span class="badge warn">≤ 30s</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Layer 2: Learner Experience -->
+          <div class="card emerald-top">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="card-kicker" style="color: var(--accent-emerald);">LỚP 2 // TRẢI NGHIỆM NGƯỜI HỌC (BEHAVIORAL)</span>
+              <span class="badge emerald">6–8 Sinh viên đúng ICP</span>
+            </div>
+            <p class="card-text" style="font-size: 0.74rem;">
+              Tuyển qua lớp học/CLB để quan sát hành vi thực tế (quy mô thăm dò, không đại diện toàn thị trường).
+            </p>
+            <table class="slide-table" style="margin-top: 0.2rem;">
+              <thead>
+                <tr>
+                  <th>Câu hỏi kiểm chứng</th>
+                  <th>Cách đo thực nghiệm</th>
+                  <th>Ngưỡng</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Có hiểu phản hồi?</strong></td>
+                  <td>Tự giải thích lại vấn đề & tự sửa đoạn liên quan (không chép AI)</td>
+                  <td><span class="badge emerald">≥ 6/8 người</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Có luyện tiếp không?</strong></td>
+                  <td>Tỷ lệ hoàn thành bài luyện ngắn sau phản hồi (log hệ thống)</td>
+                  <td><span class="badge primary">≥ 70%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Có áp dụng được?</strong></td>
+                  <td>Viết đoạn mới không gợi ý; chuyên gia chấm lỗi cũ còn lặp không</td>
+                  <td><span class="badge emerald">Đa số hết lặp</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Có dễ dùng không?</strong></td>
+                  <td>Thang SUS (10 câu) + quan sát 5 nhiệm vụ (UC01–UC06)</td>
+                  <td><span class="badge primary">SUS ≥ 68</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Muốn dùng tiếp?</strong></td>
+                  <td>Cam kết dùng tiếp 2 tuần & mức sẵn sàng trả phí/tháng</td>
+                  <td><span class="badge">Chốt ICP</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SLIDE 12: TIÊU CHÍ THÀNH CÔNG, DẤU HIỆU ĐỔI HƯỚNG & TÓM TẮT
+         ====================================================================== -->
+    <section class="slide" data-index="11">
+      <div class="slide-top-bar reveal d-1">
+        <span class="section-tag">PHẦN 4 & TÓM TẮT // NGHIỆM THU POC</span>
+        <div class="slide-meta">3.6 TIÊU CHÍ THÀNH CÔNG & 4.4 DẤU HIỆU ĐỔI HƯỚNG</div>
+      </div>
+
+      <div class="slide-header reveal d-2">
+        <h2 class="slide-title">Tiêu chí thành công bắt buộc & Dấu hiệu cần đổi hướng (Pivot)</h2>
+        <p class="slide-subtitle">Đảm bảo tính trung thực khoa học: đặt trước cả điều kiện thành công lẫn kịch bản cần điều chỉnh sản phẩm.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2 reveal d-3">
+          <!-- 3 Mandatory Success Criteria -->
+          <div class="card accent-top">
+            <span class="card-kicker">3 TIÊU CHÍ THÀNH CÔNG BẮT BUỘC CỦA POC (MỤC 3.6)</span>
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem;">
+              <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                <span class="badge emerald" style="font-size: 0.85rem; padding: 0.3rem 0.6rem;">01</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem;">100% Trích dẫn xác thực</div>
+                  <p class="card-text" style="font-size: 0.76rem;">Mọi nhận xét hiển thị cho người dùng đều có đoạn trích tồn tại nguyên văn trong bài viết.</p>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                <span class="badge emerald" style="font-size: 0.85rem; padding: 0.3rem 0.6rem;">02</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem;">100% Nối tới bài luyện đúng kỹ năng</div>
+                  <p class="card-text" style="font-size: 0.76rem;">Mỗi vấn đề ưu tiên đều dẫn tới ít nhất một bài luyện khớp kỹ năng trong bản đồ 18 kỹ năng con.</p>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                <span class="badge emerald" style="font-size: 0.85rem; padding: 0.3rem 0.6rem;">03</span>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.88rem;">Hoàn thành trọn vẹn chu trình học</div>
+                  <p class="card-text" style="font-size: 0.76rem;">Người học thử nghiệm hoàn tất chuỗi: <strong>Viết → Phản hồi → Luyện tập ngắn → Áp dụng lại</strong>.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 Pivot Signals -->
+          <div class="card warn-top">
+            <span class="card-kicker" style="color: var(--accent-secondary);">3 DẤU HIỆU CẦN ĐỔI HƯỚNG (MỤC 4.4 PIVOT SIGNALS)</span>
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem;">
+              <div style="padding: 0.55rem 0.75rem; background: var(--bg-warn-soft); border-radius: 6px;">
+                <div style="font-weight: 700; font-size: 0.82rem; color: var(--accent-secondary);">Tín hiệu 1: Chỉ xem điểm rồi thoát, bỏ qua bước luyện</div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary);">→ <strong>Hành động:</strong> Xem lại concept sản phẩm hoặc chọn phân khúc người học có động lực cam kết rõ hơn.</p>
+              </div>
+
+              <div style="padding: 0.55rem 0.75rem; background: var(--bg-warn-soft); border-radius: 6px;">
+                <div style="font-weight: 700; font-size: 0.82rem; color: var(--accent-secondary);">Tín hiệu 2: Rào cản thực sự là thiếu thời gian chứ không phải thiếu hướng dẫn</div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary);">→ <strong>Hành động:</strong> Điều chỉnh lại ICP và thiết kế lại thời lượng/cách tổ chức đơn vị bài luyện.</p>
+              </div>
+
+              <div style="padding: 0.55rem 0.75rem; background: var(--bg-warn-soft); border-radius: 6px;">
+                <div style="font-weight: 700; font-size: 0.82rem; color: var(--accent-secondary);">Tín hiệu 3: Sửa được bài cũ khi nhìn gợi ý nhưng vẫn lặp lỗi ở bài mới</div>
+                <p style="font-size: 0.75rem; color: var(--text-secondary);">→ <strong>Hành động:</strong> Thiết kế lại cấu trúc sư phạm của bài luyện ngắn để tăng khả năng chuyển giao kỹ năng.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-strip reveal d-4" style="background: var(--bg-accent-soft); border-left-color: var(--accent-primary);">
+          <div>
+            <strong>Thông điệp kết luận:</strong> BandCraft không cạnh tranh bằng việc viết hộ hay cho điểm hào nhoáng — giá trị cốt lõi nằm ở sự kết hợp <strong>Kiểm chứng bằng Thuật toán + Chấm điểm bằng LLM</strong> để biến mỗi lỗi sai thành một bước luyện tập có mục tiêu.
+          </div>
+          <span class="badge primary">Q&A // CẢM ƠN HỘI ĐỒNG</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       PROGRESS BAR & FOOTER CONTROLS
+       ======================================================================== -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <footer class="deck-footer">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <strong style="color: var(--text-primary);">BANDCRAFT DECK</strong>
+      <span id="slideCounter" style="color: var(--text-muted);">01 / 12</span>
+    </div>
+
+    <div class="nav-dots" id="navDots" aria-label="Slide navigation"></div>
+
+    <div class="nav-controls">
+      <button class="ctrl-btn" id="prevBtn" title="Slide trước (←)">← Trước</button>
+      <button class="ctrl-btn" id="nextBtn" title="Slide tiếp (→ / Space)">Tiếp →</button>
+      <button class="ctrl-btn" id="themeBtn" title="Đổi giao diện Sáng/Tối (T)"> Giao diện</button>
+      <button class="ctrl-btn" id="fsBtn" title="Toàn màn hình (F)">⛶ Full</button>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       PRESENTATION CONTROLLER SCRIPT
+       ======================================================================== -->
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const total = slides.length;
+      const counterEl = document.getElementById('slideCounter');
+      const progressEl = document.getElementById('progressFill');
+      const dotsContainer = document.getElementById('navDots');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const themeBtn = document.getElementById('themeBtn');
+      const fsBtn = document.getElementById('fsBtn');
+
+      let current = 0;
+      let wheelCooldown = false;
+
+      // Build navigation dots
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = 'nav-dot' + (idx === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Chuyển tới slide ' + (idx + 1));
+        dot.addEventListener('click', () => goTo(idx));
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = Array.from(dotsContainer.querySelectorAll('.nav-dot'));
+
+      function updateUI() {
+        slides.forEach((s, i) => {
+          s.classList.toggle('active', i === current);
+        });
+        dots.forEach((d, i) => {
+          d.classList.toggle('active', i === current);
+        });
+        const formattedCurrent = String(current + 1).padStart(2, '0');
+        const formattedTotal = String(total).padStart(2, '0');
+        counterEl.textContent = `${formattedCurrent} / ${formattedTotal}`;
+        progressEl.style.width = `${((current + 1) / total) * 100}%`;
+        history.replaceState(null, '', `#slide-${current + 1}`);
+      }
+
+      function goTo(index) {
+        if (index < 0 || index >= total) return;
+        current = index;
+        updateUI();
+      }
+
+      function next() {
+        if (current < total - 1) goTo(current + 1);
+      }
+
+      function prev() {
+        if (current > 0) goTo(current - 1);
+      }
+
+      function toggleTheme() {
+        const body = document.body;
+        const nextTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', nextTheme);
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      // Keyboard navigation
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) {
+          e.preventDefault();
+          next();
+        } else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) {
+          e.preventDefault();
+          prev();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          goTo(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          goTo(total - 1);
+        } else if (e.key.toLowerCase() === 't') {
+          toggleTheme();
+        } else if (e.key.toLowerCase() === 'f') {
+          toggleFullscreen();
+        }
+      });
+
+      // Wheel navigation (debounced)
+      window.addEventListener('wheel', (e) => {
+        if (wheelCooldown) return;
+        if (Math.abs(e.deltaY) < 28) return;
+        wheelCooldown = true;
+        if (e.deltaY > 0) next();
+        else prev();
+        setTimeout(() => { wheelCooldown = false; }, 520);
+      }, { passive: true });
+
+      // Touch swipe navigation
+      let touchStartX = 0;
+      window.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      window.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].screenX;
+        if (Math.abs(diff) > 45) {
+          if (diff > 0) next();
+          else prev();
+        }
+      }, { passive: true });
+
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      themeBtn.addEventListener('click', toggleTheme);
+      fsBtn.addEventListener('click', toggleFullscreen);
+
+      // Load initial hash if present
+      const hashMatch = window.location.hash.match(/#slide-(\d+)/);
+      if (hashMatch) {
+        const idx = parseInt(hashMatch[1], 10) - 1;
+        if (idx >= 0 && idx < total) current = idx;
+      }
+      updateUI();
+    })();
+  </script>
+</body>
+</html>
